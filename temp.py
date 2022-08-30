@@ -1,6 +1,7 @@
 import time
 import board
 import adafruit_dht
+from picamera import picamera
 
 # Initialize the DHT device, identify which GPIO port it's using (D4 in this case) and disable pulseIO
 dhtDevice = adafruit_dht.DHT22(board.D4, use_pulseio=False)

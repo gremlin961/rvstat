@@ -1,13 +1,9 @@
 import board
 import adafruit_dht
 
-def get(device):
-    # "device" references the GPIO port or remote device passed to the module from the calling script
-    dhtDevice = adafruit_dht.DHT22(board. +device, use_pulseio=False)
-    temperature_f = dhtDevice.temperature * 1.8 + 32
-    humidity = dhtDevice.humidity
-    print(
-        "Temp: {:.1f} F / Humidity: {}% ".format(
-            temperature_f, humidity
-        )
-    )
+def get():
+    dhtDevice1 = adafruit_dht.DHT22(board.D4, use_pulseio=False)
+    device1 = {
+        temperature_f = dhtDevice1.temperature * 1.8 + 32
+        humidity = dhtDevice1.humidity
+    }
