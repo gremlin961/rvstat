@@ -1,8 +1,11 @@
 import time
-import temperature
+import environmentals
+import snapshot
 
-Temp = temperature.temp()
-Humid = temperature.humidity()
+Temp = environmentals.temp()
+Humidity = environmentals.humidity()
 
 print(Temp)
-print(Humid)
+print(Humidity)
+
+image = snapshot.stillshot('/home/rkiles/image.jpg')
