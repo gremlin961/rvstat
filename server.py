@@ -20,11 +20,12 @@ PAGE="""\
 <title>Raspberry Pi - Surveillance Camera</title>
 </head>
 <body>
-<center><h1>Current temp is {Temp}</h1></center>
+<center><h1>Current temperature is {Temp} &#8457;</h1></center>
+<center><h1>Current humidity is {Humidity} %</h1></center>
 <center><img src="stream.mjpg" width="640" height="480"></center>
 </body>
 </html>
-""".format(Temp=Temp)
+""".format(Temp=Temp, Humidity=Humidity)
 
 class StreamingOutput(object):
     def __init__(self):
