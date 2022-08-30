@@ -1,8 +1,8 @@
 import time
 import temperature
 
-Temp = temperature.temp(temperature_f)
-Humid = temperature.humidity(humidity)
+Temp = temperature.temp()
+Humid = temperature.humidity()
 
 print(Temp)
 print(Humid)
