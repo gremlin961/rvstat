@@ -19,3 +19,5 @@ def liveshot(path):
     camera.stop_recording()
     camera.stop_preview()
     return('Video saved to ' +path)
+
+def livestream(path):

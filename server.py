@@ -8,6 +8,11 @@ import logging
 import socketserver
 from threading import Condition
 from http import server
+import environmentals
+
+Temp = environmentals.temp()
+Humidity = environmentals.humidity()
+
 
 PAGE="""\
 <html>
@@ -15,11 +20,11 @@ PAGE="""\
 <title>Raspberry Pi - Surveillance Camera</title>
 </head>
 <body>
-<center><h1>Raspberry Pi - Surveillance Camera</h1></center>
+<center><h1>Current temp is {Temp}</h1></center>
 <center><img src="stream.mjpg" width="640" height="480"></center>
 </body>
 </html>
-"""
+""".format(Temp=Temp)
 
 class StreamingOutput(object):
     def __init__(self):
