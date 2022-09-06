@@ -1,0 +1,19 @@
+Install instructions for supporting items
+
+
+-- Install GCP components on Raspberry Pi
+sudo apt-get install apt-transport-https ca-certificates gnupg
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+sudo apt-get update && sudo apt-get install google-cloud-cli
+gcloud init
+
+pip3 install --upgrade google-cloud-pubsub
+pip3 install --upgrade google-cloud-storage
+
+-- Create Service Accounts for PubSub Publishers and Subscribers
+
+
+-- Create a PubSub topic and subscription
+gcloud pubsub topics create rvstat-test1
+gcloud pubsub subscriptions create rvstat-test1-sub --topic rvstat-test1
