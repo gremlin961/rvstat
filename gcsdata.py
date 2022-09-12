@@ -39,9 +39,3 @@ def download_blob(bucket_name, source_file, destination_file):
     # using `Bucket.blob` is preferred here.
     blob = bucket.blob(source_file)
     blob.download_to_filename(destination_file)
-
-    #print(
-    #    "Downloaded storage object {} from bucket {} to local file {}.".format(
-    #        source_file, bucket_name, destination_file
-    #    )
-    #)

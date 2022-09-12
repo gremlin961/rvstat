@@ -1,11 +1,13 @@
 import time
 import environmentals
 import snapshot
-import pubtopic
+import pub
 
-Temp = environmentals.temp()
-Humidity = environmentals.humidity()
+temp = environmentals.temp()
+humidity = environmentals.humidity()
+date = environmentals.date()
+time = environmentals.time()
 image = snapshot.stillshot('/home/rkiles/image.jpg')
 #video = snapshot.liveshot('/home/rkiles/video.h264')
 
-message = pubtopic.send(Temp,Humidity)
+message = pub.publish(temp, humidity, date, time, image)

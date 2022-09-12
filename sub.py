@@ -1,46 +1,39 @@
-from concurrent.futures import TimeoutError
-from google.cloud import pubsub_v1
+from google.cloud import datastore
+import base64
 import json
-import gcsdata
-
-# TODO(developer)
-project_id = "rkiles-home"
-subscription_id = "rvstat-test1-sub"
-# Number of seconds the subscriber should listen for messages
-timeout = 3.0
-
-subscriber = pubsub_v1.SubscriberClient()
-# The `subscription_path` method creates a fully qualified identifier
-# in the form `projects/{project_id}/subscriptions/{subscription_id}`
-subscription_path = subscriber.subscription_path(project_id, subscription_id)
-
-def callback(message):
-    global readings
-    readings = json.loads(message.data)
-    message.ack()
 
 
-streaming_pull_future = subscriber.subscribe(subscription_path, callback)
-print(f"Listening for messages on {subscription_path}..\n")
+def run(event, context):
+  """Triggered from a message on a Cloud Pub/Sub topic.
+  Args:
+       event (dict): Event payload.
+       context (google.cloud.functions.Context): Metadata for the event.
+  """
+  pubsub_message = base64.b64decode(event['data']).decode('utf-8')
+  data = json.loads(pubsub_message)
+  temp = data["temp"]
+  humidity = data["humidity"]
+  date = data["date"]
+  time = data["time"]
+  image = data["image"]
+  #print("data from pubsub = "+temp+" "+humidity+" "+date+" "+time+" "+image+" ")
 
+  client = datastore.Client()
 
-# Wrap subscriber in a 'with' block to automatically call close() when done.
-with subscriber:
-    try:
-        # When `timeout` is not set, result() will block indefinitely,
-        # unless an exception is encountered first.
-        streaming_pull_future.result(timeout=timeout)
-    except TimeoutError:
-        streaming_pull_future.cancel()  # Trigger the shutdown.
-        streaming_pull_future.result()  # Block until the shutdown is complete.
+  reading_key = client.key("Reading", "environmental")
 
-if 'readings'in globals():
-    temp = readings["temp"]
-    humidity = readings["humidity"]
-    image = readings["image"]
-    print('Temp is '+temp+' and humidity is '+humidity)
-    print('Downloading image now')
-    imagedown = gcsdata.download_blob('rkiles-test', image, '/home/admin_/wip/image-down.jpg')
-else:
-    print('No new data found')
-    exit()
+  reading = datastore.Entity(key=reading_key)
+  print("Starting delivery to Datastore")
+
+  reading.update(
+      {
+          "temp": temp,
+          "humidity": humidity,
+          "time": time,
+          "date": date,
+          "image": image
+      }
+  )
+
+  client.put(reading)
+  print("Message delivery comlete")

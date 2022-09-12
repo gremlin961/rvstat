@@ -1,100 +1,64 @@
-# Web streaming example
-# Source code from the official PiCamera package
-# http://picamera.readthedocs.io/en/latest/recipes2.html#web-streaming
-
-import io
-import picamera
-import logging
-import socketserver
-from threading import Condition
-from http import server
-import environmentals
-
-Temp = environmentals.temp()
-Humidity = environmentals.humidity()
+from flask import Flask
+import os
+import datetime
+from google.cloud import storage
+import tempfile
+import gcsdata
 
 
-PAGE="""\
-<html>
-<head>
-<title>Raspberry Pi - Surveillance Camera</title>
-</head>
-<body>
-<center><h1>Current temperature is {Temp} &#8457;</h1></center>
-<center><h1>Current humidity is {Humidity} %</h1></center>
-<center><img src="stream.mjpg" width="640" height="480"></center>
-</body>
-</html>
-""".format(Temp=Temp, Humidity=Humidity)
+app = Flask(__name__)
 
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
+IMG_FOLDER = os.path.join('static', 'images')
+app.config['UPLOAD_FOLDER'] = IMG_FOLDER
 
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/':
-            self.send_response(301)
-            self.send_header('Location', '/index.html')
-            self.end_headers()
-        elif self.path == '/index.html':
-            content = PAGE.encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            try:
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-            except Exception as e:
-                logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
-        else:
-            self.send_error(404)
-            self.end_headers()
+def download_blob(bucket_name, source_file, destination_file):
+    """Downloads a blob from the bucket."""
+    # The ID of your GCS bucket
+    bucket_name = bucket_name
+    # The ID of your GCS object
+    source_file = source_file
+    # The path to which the file should be downloaded
+    destination_file = destination_file
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
 
-with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
-    output = StreamingOutput()
-    #Uncomment the next line to change your Pi's Camera rotation (in degrees)
-    #camera.rotation = 90
-    camera.start_recording(output, format='mjpeg')
-    try:
-        address = ('', 8000)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-    finally:
-        camera.stop_recording()
+    blob = bucket.blob(source_file)
+    blob.download_to_filename(destination_file)
+
+
+@app.route('/')
+def hello():
+    now = datetime.datetime.now()
+    time = now.strftime("%H:%M:%S")
+    temp = 72
+    humidity = 42
+    image_down = download_blob('rkiles-test', 'image-up.jpg', './static/images/image.jpg')
+    image = os.path.join(app.config['UPLOAD_FOLDER'], 'image.jpg')
+
+
+
+    PAGE="""\
+    <html>
+    <head>
+    <title>Raspberry Pi - Surveillance Camera</title>
+    </head>
+    <body>
+    <center><h1>Current temperature is {temp} &#8457;</h1></center>
+    <center><h1>Current humidity is {humidity} %</h1></center>
+    <center><h1>Current time is {time} on {date}%</h1></center>
+    <center><img src={image} width="640" height="480"></center>
+    </body>
+    </html>
+    """.format(temp=temp, humidity=humidity, time=time, date=date, image=image)
+    return PAGE
+
+
+
+# main driver function
+if __name__ == '__main__':
+
+    # run() method of Flask class runs the application
+    # on the local development server.
+    app.run(host='0.0.0.0', port=80)
