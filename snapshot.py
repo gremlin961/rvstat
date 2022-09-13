@@ -9,7 +9,7 @@ def stillshot(path):
     sleep(5)
     camera.capture(path)
     camera.stop_preview()
-    return('Image saved to ' +path)
+    return(path)
 
 def liveshot(path):
     path = path
@@ -18,6 +18,6 @@ def liveshot(path):
     sleep(5)
     camera.stop_recording()
     camera.stop_preview()
-    return('Video saved to ' +path)
+    return(path)
 
-def livestream(path):
+#def livestream(path):
