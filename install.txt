@@ -8,8 +8,18 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyr
 sudo apt-get update && sudo apt-get install google-cloud-cli
 gcloud init
 
-pip3 install --upgrade google-cloud-pubsub
-pip3 install --upgrade google-cloud-storage
+
+--Setup environment variable for auth in /etc/profile
+export GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
+
+--Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker rkiles
+
+
+Install requirements
+pip3 install -r requirements.txt
 
 -- Create Service Accounts for PubSub Publishers and Subscribers
 
@@ -17,3 +27,10 @@ pip3 install --upgrade google-cloud-storage
 -- Create a PubSub topic and subscription
 gcloud pubsub topics create rvstat-test1
 gcloud pubsub subscriptions create rvstat-test1-sub --topic rvstat-test1
+
+
+--Docker
+apt-get update && apt-get upgrade -y
+apt-get install -y python3-pip
+pip install google-cloud-pubsub
+docker run -it -v /keys:/keys -v /home/rkiles/git/rvtemp:/rvtemp -e GOOGLE_APPLICATION_CREDENTIALS="/keys/rkiles-home-707f0b035f73.json" --name pub ubuntu:latest /bin/bash

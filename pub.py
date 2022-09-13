@@ -1,6 +1,7 @@
 from google.cloud import pubsub_v1
 import json
-import gcsdata
+import sys
+#import gcsdata
 
 # TODO(developer)
 project_id = "rkiles-home"
@@ -11,15 +12,15 @@ publisher = pubsub_v1.PublisherClient()
 # in the form `projects/{project_id}/topics/{topic_id}`
 topic_path = publisher.topic_path(project_id, topic_id)
 
-def publish(temp, humidity, date, time, image):
+def publish(temp, humidity, date, time, imageDest):
     temp = temp
     humidity = humidity
     date = date
     time = time
-    image = image
-    imageDest = 'image-up.jpg'
+    #image = image
+    imageDest = imageDest
 
-    imageup = gcsdata.upload_blob('rvstat-dev', image, imageDest)
+    #imageup = gcsdata.upload_blob('rvstat-dev', image, imageDest)
 
     data = '{"temp":"'+temp+'", "humidity":"'+humidity+'", "date":"'+date+'", "time":"'+time+'", "image":"'+imageDest+'"}'
 
