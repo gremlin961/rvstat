@@ -34,3 +34,4 @@ apt-get update && apt-get upgrade -y
 apt-get install -y python3-pip
 pip install google-cloud-pubsub
 docker run -it -v /keys:/keys -v /home/rkiles/git/rvtemp:/rvtemp -e GOOGLE_APPLICATION_CREDENTIALS="/keys/rkiles-home-707f0b035f73.json" --name pub ubuntu:latest /bin/bash
+docker run -it -v /keys:/keys -v /home/rkiles/git/rvtemp:/rvtemp -e GOOGLE_APPLICATION_CREDENTIALS="/keys/rkiles-home-707f0b035f73.json" pub:latest /bin/bash -c "python3 /rvtemp/pub.py mytestvar1 mytestvar2"

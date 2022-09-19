@@ -15,6 +15,8 @@ imageDest = 'image-up.jpg'
 
 imageup = gcsdata.upload_blob('rvstat-dev', image, imageDest)
 
+pubdata = temp+' '+humidity+' '+date+' '+time+' '+imageDest
+
 docker_client = docker.from_env()
-docker_client.containers.run("pub", "")
+docker_client.containers.run("pub", "python3 /app/pub.py "+pubdata, environment=['GOOGLE_APPLICATION_CREDENTIALS=/keys/rkiles-home-707f0b035f73.json'], volumes=['/keys:/keys','/home/rkiles/git/rvtemp:/app'])
 #message = pub.publish(temp, humidity, date, time, imageDest)
