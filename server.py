@@ -2,6 +2,8 @@ from flask import Flask
 import os
 import datetime
 from google.cloud import storage
+from google.cloud import datastore
+import json
 import tempfile
 import gcsdata
 
@@ -30,11 +32,19 @@ def download_blob(bucket_name, source_file, destination_file):
 
 @app.route('/')
 def hello():
-    now = datetime.datetime.now()
-    time = now.strftime("%H:%M:%S")
-    temp = 72
-    humidity = 42
-    image_down = download_blob('rkiles-test', 'image-up.jpg', './static/images/image.jpg')
+    #now = datetime.datetime.now()
+    #time = now.strftime("%H:%M:%S")
+    #temp = 72
+    #humidity = 42
+    client = datastore.Client()
+    reading_key = client.key("Reading", "environmental")
+    query = client.get(reading_key)
+    #print(query['temp'])
+    temp = query['temp']
+    humidity = query['humidity']
+    date = query['date']
+    time = query['time']
+    image_down = download_blob('rvstat-dev', 'image-up.jpg', './static/images/image.jpg')
     image = os.path.join(app.config['UPLOAD_FOLDER'], 'image.jpg')
 
 
