@@ -1,6 +1,7 @@
 from google.cloud import pubsub_v1
 import json
 import sys
+import os
 #import gcsdata
 
 # TODO(developer)
@@ -23,9 +24,22 @@ def publish(temp, humidity, date, time, imageDest):
     #imageup = gcsdata.upload_blob('rvstat-dev', image, imageDest)
 
     data = '{"temp":"'+temp+'", "humidity":"'+humidity+'", "date":"'+date+'", "time":"'+time+'", "image":"'+imageDest+'"}'
-
+    print(data)
     message = data.encode("utf-8")
     future = publisher.publish(topic_path, message)
-    #print(future.result())
+    print(future.result())
 
     #print(f"Published messages to {topic_path}.")
+if __name__ == "__main__":
+    exvar1 = sys.argv[1]
+    exvar2 = sys.argv[2]
+    exvar3 = sys.argv[3]
+    exvar4 = sys.argv[4]
+    exvar5 = sys.argv[5]
+    path = '/app/output.log'
+    sys.stdout = open(path, 'w')
+    print('Message is: publish('+exvar1+', '+exvar2+', '+exvar3+', '+exvar4+', '+exvar5+')')
+    sendmessage = publish(exvar1, exvar2, exvar3, exvar4, exvar5)
+    print('message sent')
+
+    print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
