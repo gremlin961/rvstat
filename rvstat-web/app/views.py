@@ -2,10 +2,8 @@ from app import app
 import os
 from google.cloud import storage
 from google.cloud import datastore
-#import json
 import tempfile
 from flask import render_template
-#from app import gcsdata
 
 IMG_FOLDER = os.path.join('static', 'images')
 app.config['UPLOAD_FOLDER'] = IMG_FOLDER
@@ -36,7 +34,7 @@ def home():
     humidity = query['humidity']
     date = query['date']
     time = query['time']
-    image_down = download_blob('rvstat-dev', 'image-up.jpg', '/home/richard_kiles/rvstat-web/app/static/images/image.jpg')
+    image_down = download_blob('rvstat-dev', 'image-up.jpg', '/var/www/app/static/images/image.jpg')
     image = os.path.join(app.config['UPLOAD_FOLDER'], 'image.jpg')
 
     return render_template('home.html', temp=temp, humidity=humidity, date=date, time=time, image=image)
