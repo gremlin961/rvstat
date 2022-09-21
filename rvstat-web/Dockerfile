@@ -1,4 +1,4 @@
-FROM python3.8-alpine
+FROM python
 RUN apk --update add bash nano
 COPY ./ /var/www
 RUN pip install -r /var/www/requirements.txt
